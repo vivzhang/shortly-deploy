@@ -3,6 +3,13 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
     concat: {
+      options: {
+        separator: ';',
+      },
+      dist: {
+        src: ['public/client/**/*.js', 'public/lib/**/*.js'],
+        dest: 'public/dist/built.js',
+      },
     },
 
     mochaTest: {
@@ -21,15 +28,34 @@ module.exports = function(grunt) {
     },
 
     uglify: {
+      dist: {
+        files: {
+          // all the files inside dist/built.js(all the js files in client and lib)
+          'public/dist/built.min.js': ['public/dist/built.js']
+        }
+      }
     },
 
     eslint: {
       target: [
         // Add list of files to lint here
+        'public/client/**/*.js'
       ]
     },
 
     cssmin: {
+      target: {
+        files: [{
+          expand: true,
+          // relative path
+          cwd: 'public',
+          // any files within the relative path that ending with .css and not .min.css
+          src: ['*.css', '!*.min.css'],
+          // always keep the min version files within the same folder of the original files
+          dest: 'public',
+          ext: '.min.css'
+        }]
+      }
     },
 
     watch: {
@@ -99,6 +125,11 @@ module.exports = function(grunt) {
 
   grunt.registerTask('deploy', [
     // add your deploy tasks here
+    'eslint',
+    'test',
+    'concat',
+    'uglify',
+    'cssmin'
   ]);
 
 
